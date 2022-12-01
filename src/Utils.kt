@@ -5,8 +5,11 @@ import java.security.MessageDigest
 /**
  * Reads lines from the given input txt file.
  */
-fun readInput(name: String) = File("src", "$name.txt")
-    .readLines()
+fun readInput(name: String) = File("src", "$name.txt").readLines()
+
+fun <T> streamInput(name: String, handler: (Sequence<String>) -> T): T = File("src", "$name.txt").bufferedReader().use {
+    handler(it.lineSequence())
+}
 
 /**
  * Converts string to md5 hash.
