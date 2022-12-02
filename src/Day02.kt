@@ -1,9 +1,9 @@
 private val file = "Day02"
 
 private enum class RoundResult(val char: Char, val score: Int) {
-    WIN('Z', 6),
     LOOSE('X', 0),
-    DRAW('Y', 3);
+    DRAW('Y', 3),
+    WIN('Z', 6);
 
     companion object {
         fun of(char: Char): RoundResult {
@@ -18,37 +18,16 @@ private enum class Hand(val charOp: Char, val charMe: Char, val score: Int) {
     SCISSORS('C', 'Z', 3);
 
     fun result(op: Hand): RoundResult {
-        if (this == op) {
-            return RoundResult.DRAW
-        }
-        return when (this) {
-            ROCK -> if (op == PAPER) RoundResult.LOOSE else RoundResult.WIN
-            PAPER -> if (op == ROCK) RoundResult.WIN else RoundResult.LOOSE
-            SCISSORS -> if (op == PAPER) RoundResult.WIN else RoundResult.LOOSE
+        return when (ordinal - op.ordinal) {
+            0 -> RoundResult.DRAW
+            -1, 2 -> RoundResult.LOOSE
+            1, -2 -> RoundResult.WIN
+            else -> throw AssertionError()
         }
     }
 
     fun myHandFor(desiredResult: RoundResult): Hand {
-        return if (desiredResult == RoundResult.DRAW) {
-            this
-        } else {
-            when (this) {
-                ROCK -> when (desiredResult) {
-                    RoundResult.WIN -> PAPER
-                    else -> SCISSORS
-                }
-
-                PAPER -> when (desiredResult) {
-                    RoundResult.WIN -> SCISSORS
-                    else -> ROCK
-                }
-
-                SCISSORS -> when (desiredResult) {
-                    RoundResult.WIN -> ROCK
-                    else -> PAPER
-                }
-            }
-        }
+        return values()[(ordinal + desiredResult.ordinal - 1 + 3) % 3]
     }
 
     companion object {
