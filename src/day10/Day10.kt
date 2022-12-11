@@ -50,16 +50,11 @@ private sealed interface Instruction {
 private data class CpuState(val x: Int, val cycle: Int)
 
 private fun Sequence<String>.getStates(): Sequence<CpuState> {
-    val instructions = map { Instruction.parse(it) }
+    return map { Instruction.parse(it) }
             .flatMap { it.decompose() }
-    return sequence {
-        var state = CpuState(1, 1)
-        yield(state)
-        for (instruction in instructions) {
-            state = instruction.nextState(state)
-            yield(state)
-        }
-    }
+            .runningFold(CpuState(1, 1)) { state, instruction ->
+                instruction.nextState(state)
+            }
 }
 
 private fun part1() {
@@ -68,7 +63,7 @@ private fun part1() {
 
         val states = input.getStates()
 
-        println(states.onEach { println(it) }.sumOf { if (it.cycle in cycles) it.x * it.cycle else 0 })
+        println(states.sumOf { if (it.cycle in cycles) it.x * it.cycle else 0 })
     }
 }
 
